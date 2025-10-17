@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Protected Page</title>
+    <title>Protected Page — በሽትኛ ደንቆሮ አህያ</title>
     <style>
         body {
             font-family: 'Courier New', Courier, monospace;
@@ -23,7 +23,6 @@
             text-shadow: 0 0 20px rgba(0, 255, 120, 0.6);
         }
 
-        /* Protected Content */
         #protectedContent {
             filter: blur(25px);
             pointer-events: none;
@@ -37,7 +36,6 @@
             opacity: 1;
         }
 
-        /* Gallery */
         .gallery {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -82,6 +80,7 @@
             font-size: 20px;
             color: #ff7f50;
             text-shadow: 1px 1px 2px #000;
+            font-family: 'Times New Roman', Times, serif;
         }
 
         .comment-section {
@@ -124,7 +123,6 @@
             box-shadow: 0 0 15px rgba(0, 255, 120, 0.8);
         }
 
-        /* Login Overlay */
         #loginOverlay {
             position: fixed;
             top: 0;
@@ -155,7 +153,7 @@
             text-shadow: 0 0 5px #00ff8f;
         }
 
-        #loginBox input {
+        input {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
@@ -173,33 +171,75 @@
             margin-bottom: 10px;
         }
 
+        #logoutBtn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: #ff6060;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+        }
+
         #loginError {
             color: red;
             display: none;
             margin-top: 5px;
         }
+
+        #welcomeMsg {
+            display: none;
+            font-size: 30px;
+            color: #00ff99;
+            text-shadow: 0 0 20px #00ff88;
+            animation: fadeIn 2s ease forwards, glow 2s infinite alternate;
+            margin-top: 50px;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #00ff88;
+            }
+
+            to {
+                text-shadow: 0 0 25px #00ffcc, 0 0 45px #00ff88;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <button id="logoutBtn">Logout</button>
 
-    <!-- LOGIN OVERLAY -->
     <div id="loginOverlay">
         <div id="loginBox">
-            <h2>🔐 Enter Username</h2>
-            <input type="text" id="usernameInput" placeholder="Your name">
-            <div id="passwordContainer" style="display:none;">
-                <input type="password" id="passwordInput" value="AZIZA510" readonly>
-                <button id="showPassword">Show Password</button>
-            </div>
+            <h2>🔐 Login to Continue</h2>
+            <input type="text" id="usernameInput" placeholder="Enter your name">
+            <input type="password" id="passwordInput" placeholder="Enter password">
+            <button id="showPassword">Show Password</button>
             <button id="loginBtn">Login</button>
-            <p id="loginError">⚠️ Please enter your name first!</p>
+            <p id="loginError">⚠️ Incorrect password or missing name!</p>
         </div>
     </div>
 
-    <!-- PROTECTED CONTENT -->
     <div id="protectedContent">
-        <h1>በሽትኛ ደንቆሮ አህያ</h1>
+        <h1>በሽትኛ ደንቆሮ አህያ ንፍጣም ዘገምትኛ</h1>
 
         <div class="gallery">
             <img src="ab1.jpg" alt="">
@@ -222,29 +262,25 @@
         </div>
     </div>
 
+    <div id="welcomeMsg"></div>
+
     <p class="developed-by">Developed by MUHAMMED JEMAL & ABDULHAKEM HASEN</p>
 
     <script>
-        const loginOverlay = document.getElementById("loginOverlay");
+        const PASSWORD = "AZIZA510";
         const usernameInput = document.getElementById("usernameInput");
-        const passwordContainer = document.getElementById("passwordContainer");
         const passwordInput = document.getElementById("passwordInput");
-        const showPassword = document.getElementById("showPassword");
         const loginBtn = document.getElementById("loginBtn");
+        const showPassword = document.getElementById("showPassword");
+        const loginOverlay = document.getElementById("loginOverlay");
         const loginError = document.getElementById("loginError");
-        const content = document.getElementById("protectedContent");
+        const protectedContent = document.getElementById("protectedContent");
+        const welcomeMsg = document.getElementById("welcomeMsg");
+        const logoutBtn = document.getElementById("logoutBtn");
 
-        // Show password container when username is typed
-        usernameInput.addEventListener("input", () => {
-            if (usernameInput.value.trim() !== "") {
-                passwordContainer.style.display = "block";
-                loginError.style.display = "none";
-            } else {
-                passwordContainer.style.display = "none";
-            }
-        });
+        const savedUsername = localStorage.getItem("username");
+        if (savedUsername) usernameInput.value = savedUsername;
 
-        // Toggle password visibility
         showPassword.addEventListener("click", () => {
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";
@@ -255,18 +291,36 @@
             }
         });
 
-        // Login button
         loginBtn.addEventListener("click", () => {
             const username = usernameInput.value.trim();
-            if (!username) {
+            const password = passwordInput.value.trim();
+
+            if (!username || password !== PASSWORD) {
                 loginError.style.display = "block";
-            } else {
-                loginOverlay.style.display = "none";
-                content.classList.add("unlocked");
+                return;
             }
+
+            localStorage.setItem("username", username);
+            loginOverlay.style.display = "none";
+            protectedContent.classList.add("unlocked");
+            logoutBtn.style.display = "block";
+            showWelcome(username);
         });
 
-        // === Comment System ===
+        logoutBtn.addEventListener("click", () => {
+            protectedContent.classList.remove("unlocked");
+            loginOverlay.style.display = "flex";
+            passwordInput.value = "";
+            logoutBtn.style.display = "none";
+        });
+
+        function showWelcome(name) {
+            welcomeMsg.textContent = `👋 Welcome ${name}!`;
+            welcomeMsg.style.display = "block";
+            setTimeout(() => welcomeMsg.style.display = "none", 4000);
+        }
+
+        // Comment System
         const commentList = document.getElementById("commentList");
         const postComment = document.getElementById("postComment");
         const commentBox = document.getElementById("commentBox");
@@ -274,30 +328,33 @@
 
         function renderComments() {
             commentList.innerHTML = "";
-            if (comments.length === 0) commentList.innerHTML = "<p style='color:#ccc'>No comments yet.</p>";
-            comments.forEach(c => {
-                const div = document.createElement("div");
-                div.style.margin = "10px 0";
-                div.style.background = "#222";
-                div.style.padding = "10px";
-                div.style.borderRadius = "8px";
-                div.innerHTML = `<p><strong>${c.user}</strong>: ${c.text}</p>`;
-                commentList.appendChild(div);
-            });
+            if (comments.length === 0) {
+                commentList.innerHTML = "<p style='color:#ccc'>No comments yet.</p>";
+            } else {
+                comments.forEach(c => {
+                    const div = document.createElement("div");
+                    div.style.margin = "10px 0";
+                    div.style.background = "#222";
+                    div.style.padding = "10px";
+                    div.style.borderRadius = "8px";
+                    div.innerHTML = `<p><strong>${c.user}</strong>: ${c.text}</p>`;
+                    commentList.appendChild(div);
+                });
+            }
         }
+
         renderComments();
 
         postComment.addEventListener("click", () => {
             const text = commentBox.value.trim();
             if (!text) return;
-            const user = usernameInput.value.trim() || "Anonymous";
+            const user = localStorage.getItem("username") || "Anonymous";
             comments.push({ user, text });
             localStorage.setItem("comments", JSON.stringify(comments));
             commentBox.value = "";
             renderComments();
         });
     </script>
-
 </body>
 
 </html>
