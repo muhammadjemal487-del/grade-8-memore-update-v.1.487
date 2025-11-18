@@ -267,53 +267,6 @@
     <p class="developed-by">Developed by MUHAMMED JEMAL & ABDULHAKEM HASEN</p>
 
     <script>
-        const PASSWORD = "AZIZA510";
-        const usernameInput = document.getElementById("usernameInput");
-        const passwordInput = document.getElementById("passwordInput");
-        const loginBtn = document.getElementById("loginBtn");
-        const showPassword = document.getElementById("showPassword");
-        const loginOverlay = document.getElementById("loginOverlay");
-        const loginError = document.getElementById("loginError");
-        const protectedContent = document.getElementById("protectedContent");
-        const welcomeMsg = document.getElementById("welcomeMsg");
-        const logoutBtn = document.getElementById("logoutBtn");
-
-        const savedUsername = localStorage.getItem("username");
-        if (savedUsername) usernameInput.value = savedUsername;
-
-        showPassword.addEventListener("click", () => {
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                showPassword.textContent = "Hide Password";
-            } else {
-                passwordInput.type = "password";
-                showPassword.textContent = "Show Password";
-            }
-        });
-
-        loginBtn.addEventListener("click", () => {
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-
-            if (!username || password !== PASSWORD) {
-                loginError.style.display = "block";
-                return;
-            }
-
-            localStorage.setItem("username", username);
-            loginOverlay.style.display = "none";
-            protectedContent.classList.add("unlocked");
-            logoutBtn.style.display = "block";
-            showWelcome(username);
-        });
-
-        logoutBtn.addEventListener("click", () => {
-            protectedContent.classList.remove("unlocked");
-            loginOverlay.style.display = "flex";
-            passwordInput.value = "";
-            logoutBtn.style.display = "none";
-        });
-
         function showWelcome(name) {
             welcomeMsg.textContent = `👋 Welcome ${name}!`;
             welcomeMsg.style.display = "block";
@@ -358,3 +311,4 @@
 </body>
 
 </html>
+
